@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WA Chat Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#111b21;
+  font-family:'Roboto',sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:28px 14px 40px;
+  gap:24px;
+  min-height:100vh;
+}
+
+h1{
+  color:#00a884;
+  font-size:20px;
+  font-weight:700;
+}
+
+.layout{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  width:100%;
+  max-width:460px;
+}
+
+/* FORM */
+.card{
+  background:#1f2c33;
+  border-radius:12px;
+  padding:18px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.card h2{
+  color:#8696a0;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.field label{
+  display:block;
+  color:#8696a0;
+  font-size:11px;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+
+.field input,
+.field textarea{
+  width:100%;
+  background:#2a3942;
+  border:1px solid #3b4a54;
+  border-radius:8px;
+  color:#e9edef;
+  font-size:14px;
+  padding:9px 11px;
+  outline:none;
+  font-family:'Roboto',sans-serif;
+  resize:none;
+}
+
+.field input:focus,
+.field textarea:focus{
+  border-color:#00a884;
+}
+
+hr{
+  border:none;
+  border-top:1px solid #3b4a54;
+}
+
+.btn{
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  padding:11px;
+}
+
+.btn-green{
+  background:#00a884;
+  color:#fff;
+}
+
+.btn-dl{
+  background:#2a3942;
+  color:#00a884;
+  border:1.5px solid #00a884;
+  font-size:13px;
+  padding:9px 20px;
+  display:none;
+}
+
+/* PREVIEW */
+#preview-wrap{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+}
+
+.preview-label{
+  color:#8696a0;
+  font-size:11px;
+  text-transform:uppercase;
+}
+
+/* WA SCREEN */
+#wa-screen{
+  width:380px;
+  background-color:#e5ddd5;
+
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23c9b99a' stroke-width='0.5' opacity='0.35'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Ccircle cx='60' cy='20' r='8'/%3E%3Ccircle cx='20' cy='60' r='8'/%3E%3Ccircle cx='60' cy='60' r='8'/%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3C/g%3E%3C/svg%3E");
+
+  padding:12px 10px 12px 6px;
+  border-radius:14px;
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
+}
+
+/* MESSAGE */
+.msg-row{
+  display:flex;
+  align-items:flex-start;
+}
+
+/* AVATAR */
+.avatar-circle{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#dfe5e7;
+  flex-shrink:0;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-right:5px;
+  margin-top:-2px;
+}
+
+.avatar-circle img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* BUBBLE */
+.bubble{
+  background:#fff;
+  border-radius:0 8px 8px 8px;
+  padding:5px 7px 2px 7px;
+  max-width:290px;
+  position:relative;
+  box-shadow:0 1px 1px rgba(0,0,0,.13);
+}
+
+.bubble::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:-7px;
+
+  border-style:solid;
+  border-width:0 8px 8px 0;
+  border-color:transparent #fff transparent transparent;
+}
+
+/* SENDER */
+.bubble-sender{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  width:100%;
+  margin-bottom:1px;
+}
+
+.bubble-sender-name{
+  font-size:11.5px;
+  font-weight:700;
+  color:#BA55D3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.bubble-sender-phone{
+  font-size:11px;
+  color:#667781;
+  white-space:nowrap;
+  margin-left:auto;
+  flex-shrink:0;
+  position:relative;
+  left:-5px;
+}
+
+/* QUOTE */
+.quoted{
+  background:#f0f2f5;
+  border-left:3.5px solid #BA55D3;
+  border-radius:6px;
+  padding:5px 8px 5px 7px;
+  margin:3px 0 4px 0;
+}
+
+.quoted-header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  width:100%;
+  margin-bottom:2px;
+}
+
+.quoted-name{
+  font-size:12px;
+  font-weight:700;
+  color:#BA55D3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.quoted-phone{
+  font-size:11px;
+  color:#667781;
+  white-space:nowrap;
+  margin-left:auto;
+  flex-shrink:0;
+}
+
+.quoted-body{
+  font-size:12.5px;
+  color:#3b4a54;
+  line-height:1.4;
+}
+
+/* TEXT */
+.bubble-text{
+  font-size:14.2px;
+  color:#111b21;
+  line-height:1.45;
+  word-break:break-word;
+}
+
+/* FOOTER */
+.bubble-footer{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:3px;
+  margin-top:-4px;
+}
+
+.bubble-time{
+  font-size:9.5px;
+  color:#8696a0;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🟢 WA Chat Generator</h1>
+
+<div class="layout">
+
+  <div class="card">
+
+    <h2>Pengirim</h2>
+
+    <div class="field">
+      <label>URL Avatar</label>
+      <input
+        id="avatarUrl"
+        type="text"
+        value="https://telegra.ph/file/89c1638d9620584e6e140.png"
+      >
+    </div>
+
+    <div class="field">
+      <label>Nama Pengirim</label>
+      <input id="senderName" type="text" value="~ Avif Ainur Fadlan">
+    </div>
+
+    <div class="field">
+      <label>Nomor Pengirim</label>
+      <input id="senderPhone" type="text" value="+62 858-1566-3170">
+    </div>
+
+    <hr>
+
+    <h2>Quote</h2>
+
+    <div class="field">
+      <label>Nama Quote</label>
+      <input id="quotedName" type="text" value="~ jauhariel.cc">
+    </div>
+
+    <div class="field">
+      <label>Nomor Quote</label>
+      <input id="quotedPhone" type="text" value="+62 838-7769-8966">
+    </div>
+
+    <div class="field">
+      <label>Teks Quote</label>
+      <textarea id="quotedText" rows="2">Modal KTP udah bisa dapet cc</textarea>
+    </div>
+
+    <hr>
+
+    <h2>Pesan</h2>
+
+    <div class="field">
+      <textarea id="msgText" rows="2">KTP makmu</textarea>
+    </div>
+
+    <div class="field">
+      <label>Waktu</label>
+      <input id="msgTime" type="text" value="17.23">
+    </div>
+
+    <button class="btn btn-green" onclick="generate()">
+      ▶ Generate
+    </button>
+
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="preview-wrap">
+
+    <div class="preview-label">Preview</div>
+
+    <div id="wa-screen">
+
+      <div class="msg-row">
+
+        <div class="avatar-circle">
+          <img
+            id="el-avatar"
+            src="https://telegra.ph/file/89c1638d9620584e6e140.png"
+            alt="avatar"
+          >
+        </div>
+
+        <div class="bubble">
+
+          <div class="bubble-sender">
+            <span class="bubble-sender-name" id="el-sname">
+              ~ Avif Ainur Fadl...
+            </span>
+
+            <span class="bubble-sender-phone" id="el-sphone">
+              +62 858-1566-3170
+            </span>
+          </div>
+
+          <div class="quoted" id="el-quoted">
+
+            <div class="quoted-header">
+              <span class="quoted-name" id="el-qname">
+                ~ jauhariel.cc
+              </span>
+
+              <span class="quoted-phone" id="el-qphone">
+                +62 838-7769-8966
+              </span>
+            </div>
+
+            <div class="quoted-body" id="el-qtext">
+              Modal KTP udah bisa dapet cc
+            </div>
+
+          </div>
+
+          <div class="bubble-text" id="el-text">
+            KTP makmu
+          </div>
+
+          <div class="bubble-footer">
+
+            <span class="bubble-time" id="el-time">
+              17.23
+            </span>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-dl" id="btn-dl" onclick="downloadPng()">
+      Download PNG
+    </button>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+function limitSenderName(text, max = 17){
+  text = String(text || '').trim();
+
+  if(text.length <= max){
+    return text;
+  }
+
+  return text.slice(0, max) + '...';
+}
+
+function escNL(str){
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+}
+
+function generate(){
+
+  const avatarUrl =
+    document.getElementById('avatarUrl').value.trim() ||
+    'https://telegra.ph/file/89c1638d9620584e6e140.png';
+
+  const senderName =
+    document.getElementById('senderName').value.trim();
+
+  const senderPhone =
+    document.getElementById('senderPhone').value.trim();
+
+  const quotedName =
+    document.getElementById('quotedName').value.trim();
+
+  const quotedPhone =
+    document.getElementById('quotedPhone').value.trim();
+
+  const quotedText =
+    document.getElementById('quotedText').value.trim();
+
+  const msgText =
+    document.getElementById('msgText').value.trim();
+
+  const msgTime =
+    document.getElementById('msgTime').value.trim();
+
+  document.getElementById('el-avatar').src =
+    avatarUrl;
+
+  document.getElementById('el-sname').textContent =
+    limitSenderName(senderName, 20);
+
+  document.getElementById('el-sphone').textContent =
+    senderPhone;
+
+  document.getElementById('el-qname').textContent =
+    limitSenderName(quotedName, 17);
+
+  document.getElementById('el-qphone').textContent =
+    quotedPhone;
+
+  document.getElementById('el-qtext').innerHTML =
+    escNL(quotedText);
+
+  document.getElementById('el-text').innerHTML =
+    escNL(msgText);
+
+  document.getElementById('el-time').textContent =
+    msgTime;
+
+  const qEl = document.getElementById('el-quoted');
+
+  if(quotedName || quotedPhone || quotedText){
+    qEl.style.display = 'block';
+  }else{
+    qEl.style.display = 'none';
+  }
+
+  document.getElementById('preview-wrap').style.display =
+    'flex';
+
+  document.getElementById('btn-dl').style.display =
+    'inline-block';
+}
+
+function downloadPng(){
+
+  const el = document.getElementById('wa-screen');
+
+  html2canvas(el,{
+    scale:3,
+    useCORS:true,
+    backgroundColor:null
+  }).then(canvas=>{
+
+    const a = document.createElement('a');
+
+    a.download = 'wa-chat.png';
+
+    a.href = canvas.toDataURL('image/png');
+
+    a.click();
+  });
+}
+
+generate();
+</script>
+
+</body>
+</html>
